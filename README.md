@@ -82,15 +82,7 @@ All Available Options:
 --mail            EMAIL   Send report to this email
 --help                    Show help
 ---
-Protection Modes Explained
-MaxProtection    - Zero data loss. Primary stops if standby is unavailable.
-Use for: Critical financial or production databases.
-MaxAvailability  - Zero data loss when standby is reachable.
-Primary continues if standby becomes unavailable.
-Use for: High availability with acceptable brief outages.
-MaxPerformance   - Best primary performance. Some data loss possible.
-Use for: Development, reporting, or non-critical standbys.
----
+
 Sample Output
 ========================================================================
 Oracle Data Guard Setup  |  PRIMARY: ORCL  to  STANDBY: ORCLSTBY
@@ -109,61 +101,7 @@ Oracle Data Guard Setup  |  PRIMARY: ORCL  to  STANDBY: ORCLSTBY
 [INFO]  STEP 15 - Verify Data Guard Setup
 NAME        ROLE             OPEN_MODE   PROTECTION_MODE
 ----------- ---------------- ----------- --------------------
-ORCL        PRIMARY          READ WRITE  MAXIMUM PERFORMANCE
-ORCLSTBY    PHYSICAL STANDBY MOUNTED     MAXIMUM PERFORMANCE
-[OK]    DATA GUARD SETUP COMPLETED SUCCESSFULLY
----
-Verification Commands (Run After Setup)
-On Primary - Check Data Guard status:
-SELECT NAME, DB_UNIQUE_NAME, DATABASE_ROLE, OPEN_MODE, PROTECTION_MODE, SWITCHOVER_STATUS FROM V$DATABASE;
-On Primary - Check archive log destinations:
-SELECT DEST_NAME, STATUS, TARGET, ARCHIVER, SCHEDULE, DESTINATION FROM V$ARCHIVE_DEST WHERE STATUS='VALID';
-On Standby - Check MRP process:
-SELECT PROCESS, STATUS, THREAD#, SEQUENCE# FROM V$MANAGED_STANDBY;
-On Standby - Check applied logs:
-SELECT THREAD#, MAX(SEQUENCE#) AS LAST_APPLIED FROM V$ARCHIVED_LOG WHERE APPLIED='YES' GROUP BY THREAD#;
-On Primary - Check archive gap:
-SELECT THREAD#, LOW_SEQUENCE#, HIGH_SEQUENCE# FROM V$ARCHIVE_GAP;
-DGMGRL - Check broker config:
-dgmgrl / "show configuration"
-dgmgrl / "show database verbose ORCL_PRIMARY"
-dgmgrl / "show database verbose ORCL_STANDBY"
----
-Switchover (Planned Role Reversal)
-Using DGMGRL:
-dgmgrl / "switchover to 'ORCL_STANDBY'"
-Using SQL (on Primary):
-ALTER DATABASE COMMIT TO SWITCHOVER TO STANDBY WITH SESSION SHUTDOWN;
-Using SQL (on Standby after primary switches):
-ALTER DATABASE COMMIT TO SWITCHOVER TO PRIMARY WITH SESSION SHUTDOWN;
-ALTER DATABASE OPEN;
----
-Failover (Emergency - Standby Becomes Primary)
-Using DGMGRL:
-dgmgrl / "failover to 'ORCL_STANDBY'"
-Using SQL (on Standby):
-ALTER DATABASE RECOVER MANAGED STANDBY DATABASE FINISH;
-ALTER DATABASE ACTIVATE STANDBY DATABASE;
-ALTER DATABASE OPEN;
----
-Safety Features
-SSH connectivity validated before starting
-Pre-flight checks on primary DB status and disk space
-Signal trap for safe Ctrl+C handling
-TNS backup before any modifications
-Full logging with timestamps for every step
-Email report on completion or failure
-Auto-detection of existing ARCHIVELOG and redo log groups
----
-Log Files Generated
-dataguard_setup_<timestamp>.log        - Full execution log
-dataguard_report_<timestamp>.txt       - Summary report
-rman_duplicate_<timestamp>.log         - RMAN duplicate output
----
-Important Notes
-Always take a full RMAN backup of primary before starting
-Ensure both servers are on the same Oracle version and patch level
-Test the setup in DEV environment before applying to PRODUCTION
-RMAN Duplicate step duration depends on primary database size
-Contributions must be created after acceptance as Oracle ACE Apprentice
+
+
+
 
